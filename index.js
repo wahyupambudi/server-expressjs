@@ -2,13 +2,15 @@ import express from "express";
 import cors from "cors";
 import session from "express-session";
 import dotenv from "dotenv";
+import SequelizeStore from "connect-session-sequelize";
 // import dari routes
 import UserRoute from "./routes/UserRoute.js";
 import BarangRoute from "./routes/BarangRoute.js";
 import JbarangRoute from "./routes/JbarangRoute.js";
+import AuthRoute from "./routes/AuthRoute.js";
 
 // import config database
-// import db from "./config/database.js";
+import db from "./config/database.js";
 // gunakan untuk create table
 // (async () => {
 //   await db.sync();
@@ -25,11 +27,15 @@ dotenv.config();
 
 const app = express();
 
-// const sessionStore = SequelizeStore(session.Store);
-
-// const store = new sessionStore({
-//   db: db,
-// });
+// digunakan untuk sessions
+const sessionStore = SequelizeStore(session.Store);
+const store = new sessionStore({
+  db: db,
+  checkExpirationInterval: 1 * 60 * 1000, // interval pemberitahuan
+  expiration: 0.5 * 50 * 60 * 1000, // waktu session 15 menit
+});
+// membuat table session di database
+// store.sync();
 
 // definisikan session
 app.use(
@@ -37,7 +43,7 @@ app.use(
     secret: process.env.SESS_SECRET,
     resave: false,
     saveUninitialized: true,
-    // store: store,
+    store: store,
     cookie: {
       // auto jika menggunakan http/s
       secure: "auto",
@@ -56,9 +62,7 @@ app.use(express.json());
 app.use(UserRoute);
 app.use(BarangRoute);
 app.use(JbarangRoute);
-// app.use(AuthRoute);
-
-// store.sync();
+app.use(AuthRoute);
 
 app.listen(process.env.APP_PORT, () => {
   console.log("Server up and running...");
