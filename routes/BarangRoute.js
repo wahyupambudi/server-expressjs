@@ -6,13 +6,14 @@ import {
   updateBarang,
   deleteBarang,
 } from "../controllers/Barangs.js";
+import { verifyUser } from "../middleware/AuthUser.js";
 
 const router = express.Router();
 
-router.get("/barangs", getBarangs);
-router.get("/barangs/:id", getBarangById);
-router.post("/barangs", createBarang);
-router.patch("/barangs/:id", updateBarang);
-router.delete("/barangs/:id", deleteBarang);
+router.get("/barangs", verifyUser, getBarangs);
+router.get("/barangs/:id", verifyUser, getBarangById);
+router.post("/barangs", verifyUser, createBarang);
+router.patch("/barangs/:id", verifyUser, updateBarang);
+router.delete("/barangs/:id", verifyUser, deleteBarang);
 
 export default router;

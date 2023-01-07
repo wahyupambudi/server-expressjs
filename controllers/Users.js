@@ -75,7 +75,12 @@ export const updateUser = async (req, res) => {
       uuid: req.params.id,
     },
   });
+  // console.log(user.dataValues.id);
+  let dataIdOne = user.dataValues.id;
+  // jika user tidak ditemukan
   if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
+
+  // mendapatkan inputan dari user
   const { name, email, password, password1, role } = req.body;
   let hashPassword;
   if (password === "" || password === null) {
@@ -84,38 +89,41 @@ export const updateUser = async (req, res) => {
   } else {
     hashPassword = await argon2.hash(password);
   }
-  //   validasi jika user sama
+
+  // validasi jika user sama
   const response = await User.findAll();
 
   // perulangan untuk cek apakah email ada yang sama
   for (let i = 0; i <= response.length; i++) {
+    let dataId = response[i]?.id;
+    // console.log(dataId, dataIdOne);
     let dataEmail = response[i]?.email;
-    if (dataEmail === email) {
-      return res.status(400).json({ msg: "Update Tidak Berhasil" });
-    }
-  }
-  if (password !== password1) {
-    return res.status(400).json({ msg: "Password Tidak Cocok" });
-  }
 
-  try {
-    await User.update(
-      {
-        name: name,
-        email: email,
-        password: hashPassword,
-        role: role,
-      },
-      {
-        where: {
-          // user dari variabel const user
-          id: user.id,
-        },
+    if (dataEmail === email && dataId !== dataIdOne) {
+      return res.status(400).json({ msg: "Update Tidak Berhasil" });
+    } else if (password !== password1) {
+      return res.status(400).json({ msg: "Password Tidak Cocok" });
+    } else if (dataEmail === email || dataId === dataIdOne) {
+      try {
+        await User.update(
+          {
+            name: name,
+            email: email,
+            password: hashPassword,
+            role: role,
+          },
+          {
+            where: {
+              // user dari variabel const user
+              id: user.id,
+            },
+          }
+        );
+        res.status(200).json({ msg: "User Berhasil Update!" });
+      } catch (error) {
+        res.status(400).json({ msg: error.message });
       }
-    );
-    res.status(200).json({ msg: "User Berhasil Update!" });
-  } catch (error) {
-    res.status(400).json({ msg: error.message });
+    }
   }
 };
 
