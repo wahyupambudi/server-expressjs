@@ -8,6 +8,7 @@ export const login = async (req, res) => {
       email: req.body.email,
     },
   });
+  // jika user tidak ditemukan
   if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
 
   //   jika user ditemukan
@@ -41,6 +42,7 @@ export const sessi = async (req, res) => {
       uuid: req.session.userId,
     },
   });
+  // jika user tidak ditemukan
   if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
   res.status(200).json({ user });
 };

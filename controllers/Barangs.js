@@ -240,17 +240,6 @@ export const deleteBarang = async (req, res) => {
     if (!barang)
       return res.status(404).json({ msg: "Data Barang Tidak Ditemukan" });
 
-    // jika barang ditemukan ambil data dar req body
-    const {
-      kd_brg,
-      nm_brg,
-      spek_brg,
-      jml_brg,
-      kondisi_brg,
-      tgl_buy_brg,
-      harga_brg,
-    } = req.body;
-
     // req.role berasal dari middleware ketika login
     if (req.role === "admin") {
       await Barang.destroy({
