@@ -36,6 +36,7 @@ export const sessi = async (req, res) => {
   if (!req.session.userId) {
     return res.status(401).json({ msg: "Mohon login ke akun anda!" });
   }
+  // mencari user berdasarkan uuid / userId
   const user = await User.findOne({
     attributes: ["uuid", "name", "email", "role"],
     where: {
