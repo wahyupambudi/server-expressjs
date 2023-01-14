@@ -3,6 +3,8 @@ import cors from "cors";
 import session from "express-session";
 import dotenv from "dotenv";
 import SequelizeStore from "connect-session-sequelize";
+import fileUpload from "express-fileupload";
+
 // import dari routes
 import UserRoute from "./routes/UserRoute.js";
 import BarangRoute from "./routes/BarangRoute.js";
@@ -55,6 +57,10 @@ app.use(
 );
 
 app.use(express.json());
+app.use(fileUpload());
+app.use(express.static("public"));
+
+// app use dari router
 app.use(UserRoute);
 app.use(BarangRoute);
 app.use(JbarangRoute);

@@ -67,6 +67,14 @@ const Jbarangs = db.define(
         notEmpty: true,
       },
     },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,

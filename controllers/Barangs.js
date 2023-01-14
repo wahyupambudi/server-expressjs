@@ -162,7 +162,7 @@ export const createBarang = async (req, res) => {
   const fileSize = file.data.length;
   const ext = path.extname(file.name);
   const fileName = Date.now() + "-" + file.md5 + ext;
-  const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+  const url = `${req.protocol}://${req.get("host")}/images/barang/${fileName}`;
   const allowedType = [".png", ".jpg", ".jpeg"];
 
   // membuat kondisi jika variabel allowedType dan jika fileSize
@@ -172,7 +172,7 @@ export const createBarang = async (req, res) => {
     return res.status(422).json({ msg: "Ukuran gambar harus dibawah 5MB" });
 
   // jika kondisi benar maka akan melakukan proses simpan data
-  file.mv(`./public/images/${fileName}`, async (err) => {
+  file.mv(`./public/images/barang/${fileName}`, async (err) => {
     if (err) return res.status(500).json({ msg: err.message });
     // proses create barang
     try {
@@ -242,17 +242,17 @@ export const updateBarang = async (req, res) => {
       return res.status(422).json({ msg: "Ukuran gambar harus dibawah 5MB" });
 
     // hapus gambar
-    const filepath = `./public/images/${barang.image}`;
+    const filepath = `./public/images/barang/${barang.image}`;
     fs.unlinkSync(filepath);
 
     // pindahkan gambar ke folder public
-    file.mv(`./public/images/${fileName}`, async (err) => {
+    file.mv(`./public/images/barang/${fileName}`, async (err) => {
       if (err) return res.status(500).json({ msg: err.message });
     });
   }
 
   // deklarasi variabel url diluar scope
-  const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+  const url = `${req.protocol}://${req.get("host")}/images/barang/${fileName}`;
 
   try {
     // req.role berasal dari middleware ketika login
@@ -321,7 +321,7 @@ export const deleteBarang = async (req, res) => {
     // req.role berasal dari middleware ketika login
     if (req.role === "admin") {
       // hapus gambar
-      const filepath = `./public/images/${barang.image}`;
+      const filepath = `./public/images/barang/${barang.image}`;
       fs.unlinkSync(filepath);
       await Barang.destroy({
         where: {
@@ -334,7 +334,7 @@ export const deleteBarang = async (req, res) => {
         return res.status(403).json({ msg: "Akses Tidak ditemukan" });
       // jika kondisi terpenuhi
       // hapus gambar
-      const filepath = `./public/images/${barang.image}`;
+      const filepath = `./public/images/barang/${barang.image}`;
       fs.unlinkSync(filepath);
       await Barang.destroy({
         where: {
