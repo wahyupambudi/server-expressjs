@@ -8,7 +8,7 @@ export const getJbarangs = async (req, res) => {
   try {
     let response;
     // req.role berasal dari middleware ketika login
-    if (req.role === "admin") {
+    if (req.role) {
       response = await Jbarang.findAll({
         attributes: [
           "uuid",
@@ -22,30 +22,6 @@ export const getJbarangs = async (req, res) => {
           "image",
           "url",
         ],
-        include: [
-          {
-            model: User,
-            attributes: ["name", "email"],
-          },
-        ],
-      });
-    } else {
-      response = await Jbarang.findAll({
-        attributes: [
-          "uuid",
-          "kd_jbrg",
-          "nm_jbrg",
-          "spek_jbrg",
-          "jml_jbrg",
-          "kondisi_jbrg",
-          "tgl_buy_jbrg",
-          "harga_jbrg",
-          "image",
-          "url",
-        ],
-        where: {
-          userId: req.userId,
-        },
         include: [
           {
             model: User,
@@ -73,7 +49,7 @@ export const getJbarangById = async (req, res) => {
     let response;
     // req.role berasal dari middleware ketika login
     // jika user admin menampilkan berdasarkan id jbarang dari semua user
-    if (req.role === "admin") {
+    if (req.role) {
       response = await Jbarang.findOne({
         attributes: [
           "uuid",
@@ -89,33 +65,6 @@ export const getJbarangById = async (req, res) => {
         ],
         where: {
           id: jbarang.id,
-        },
-        include: [
-          {
-            model: User,
-            attributes: ["name", "email"],
-          },
-        ],
-      });
-    }
-    // jika user menampilkan berdasarkan id jbarang dari userid
-    else {
-      response = await Jbarang.findOne({
-        attributes: [
-          "uuid",
-          "kd_jbrg",
-          "nm_jbrg",
-          "spek_jbrg",
-          "jml_jbrg",
-          "kondisi_jbrg",
-          "tgl_buy_jbrg",
-          "harga_jbrg",
-          "image",
-          "url",
-        ],
-        where: {
-          // select berdasarkan id dan user id yang login
-          [Op.and]: [{ id: jbarang.id }, { userId: req.userId }],
         },
         include: [
           {
@@ -150,7 +99,7 @@ export const createJbarang = async (req, res) => {
     let new_kd_jbrg = getJbarangAll[i].kd_jbrg;
     // jika kd_jbrg sama
     if (new_kd_jbrg === kd_jbrg)
-      return res.status(500).json({ msg: "Kode Barang Tidak Boleh sama" });
+      return res.status(500).json({ msg: "Kode Jasa Barang Tidak Boleh sama" });
   }
 
   // check jika file kosong
@@ -188,14 +137,122 @@ export const createJbarang = async (req, res) => {
         url: url,
         userId: req.userId,
       });
-      res.status(201).json({ msg: "Data Barang Berhasil di Simpan." });
+      res.status(201).json({ msg: "Data Jasa Barang Berhasil di Simpan." });
     } catch (error) {
       res.status(500).json({ msg: error.message });
     }
   });
 };
 
-export const updateJbarang = (req, res) => {};
+export const updateJbarang = async (req, res) => {
+  // mendapatkan kodebarang sesuai id
+  const jbarang = await Jbarang.findOne({
+    where: {
+      uuid: req.params.id,
+    },
+  });
+
+  // jika barang tidak ditemukan
+  if (!jbarang)
+    return res.status(404).json({ msg: "Data Jasa Barang Tidak Ditemukan" });
+
+  // jika barang ditemukan ambil data dar req body
+  const {
+    kd_jbrg,
+    nm_jbrg,
+    spek_jbrg,
+    jml_jbrg,
+    kondisi_jbrg,
+    tgl_buy_jbrg,
+    harga_jbrg,
+  } = req.body;
+
+  // kode untuk manajemen gambar
+  let fileName;
+  // check jika gambar null maka langsung update data selain image
+  if (req.files === null) {
+    fileName = jbarang.image;
+    // console.log(fileName);
+  }
+  // jika gambar tidak kosong melakukan proses update gambar
+  else {
+    const file = req.files.image;
+    const fileSize = file.data.length;
+    const ext = path.extname(file.name);
+    fileName = Date.now() + "-" + file.md5 + ext;
+    // console.log(fileName);
+
+    const allowedType = [".png", ".jpg", ".jpeg"];
+
+    // membuat kondisi jika variabel allowedType dan jika fileSize
+    if (!allowedType.includes(ext.toLowerCase()))
+      return res.status(422).json({ msg: "Gambar tidak sesuai" });
+    if (fileSize > 5000000)
+      return res.status(422).json({ msg: "Ukuran gambar harus dibawah 5MB" });
+
+    // hapus gambar
+    const filepath = `./public/images/jbarang/${jbarang.image}`;
+    fs.unlinkSync(filepath);
+
+    // pindahkan gambar ke folder public
+    file.mv(`./public/images/jbarang/${fileName}`, async (err) => {
+      if (err) return res.status(500).json({ msg: err.message });
+    });
+  }
+
+  // deklarasi variabel url diluar scope
+  const url = `${req.protocol}://${req.get("host")}/images/jbarang/${fileName}`;
+
+  try {
+    // req.role berasal dari middleware ketika login
+    if (req.role === "admin") {
+      await Jbarang.update(
+        {
+          kd_jbrg,
+          nm_jbrg,
+          spek_jbrg,
+          jml_jbrg,
+          kondisi_jbrg,
+          tgl_buy_jbrg,
+          harga_jbrg,
+          image: fileName,
+          url: url,
+        },
+        {
+          where: {
+            id: jbarang.id,
+          },
+        }
+      );
+    } else {
+      // jika user id dan barang user id tidak sama
+      if (req.userId !== jbarang.userId)
+        return res.status(403).json({ msg: "Akses Tidak ditemukan" });
+      // jika kondisi terpenuhi
+      await Jbarang.update(
+        {
+          kd_jbrg,
+          nm_jbrg,
+          spek_jbrg,
+          jml_jbrg,
+          kondisi_jbrg,
+          tgl_buy_jbrg,
+          harga_jbrg,
+          image: fileName,
+          url: url,
+        },
+        {
+          where: {
+            [Op.and]: [{ id: jbarang.id }, { userId: req.userId }],
+          },
+        }
+      );
+    }
+    res.status(200).json({ msg: "Jasa Barang Berhasil di Update" });
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
 
 export const deleteJbarang = async (req, res) => {
   try {

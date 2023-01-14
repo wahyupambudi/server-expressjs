@@ -8,7 +8,7 @@ export const getBarangs = async (req, res) => {
   try {
     let response;
     // req.role berasal dari middleware ketika login
-    if (req.role === "admin") {
+    if (req.role) {
       response = await Barang.findAll({
         attributes: [
           "uuid",
@@ -22,30 +22,6 @@ export const getBarangs = async (req, res) => {
           "image",
           "url",
         ],
-        include: [
-          {
-            model: User,
-            attributes: ["name", "email"],
-          },
-        ],
-      });
-    } else {
-      response = await Barang.findAll({
-        attributes: [
-          "uuid",
-          "kd_brg",
-          "nm_brg",
-          "spek_brg",
-          "jml_brg",
-          "kondisi_brg",
-          "tgl_buy_brg",
-          "harga_brg",
-          "image",
-          "url",
-        ],
-        where: {
-          userId: req.userId,
-        },
         include: [
           {
             model: User,
@@ -73,7 +49,7 @@ export const getBarangById = async (req, res) => {
     let response;
     // req.role berasal dari middleware ketika login
     // jika user admin menampilkan berdasarkan id barang dari semua user
-    if (req.role === "admin") {
+    if (req.role) {
       response = await Barang.findOne({
         attributes: [
           "uuid",
@@ -89,33 +65,6 @@ export const getBarangById = async (req, res) => {
         ],
         where: {
           id: barang.id,
-        },
-        include: [
-          {
-            model: User,
-            attributes: ["name", "email"],
-          },
-        ],
-      });
-    }
-    // jika user menampilkan berdasarkan id barang dari userid
-    else {
-      response = await Barang.findOne({
-        attributes: [
-          "uuid",
-          "kd_brg",
-          "nm_brg",
-          "spek_brg",
-          "jml_brg",
-          "kondisi_brg",
-          "tgl_buy_brg",
-          "harga_brg",
-          "image",
-          "url",
-        ],
-        where: {
-          // select berdasarkan id dan user id yang login
-          [Op.and]: [{ id: barang.id }, { userId: req.userId }],
         },
         include: [
           {
