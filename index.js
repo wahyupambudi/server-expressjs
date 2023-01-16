@@ -4,6 +4,7 @@ import session from "express-session";
 import dotenv from "dotenv";
 import SequelizeStore from "connect-session-sequelize";
 import fileUpload from "express-fileupload";
+import cookieParser from "cookie-parser";
 
 // import dari routes
 import UserRoute from "./routes/UserRoute.js";
@@ -56,6 +57,7 @@ app.use(
   })
 );
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(fileUpload());
 app.use(express.static("public"));

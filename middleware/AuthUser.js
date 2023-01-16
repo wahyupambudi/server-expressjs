@@ -1,4 +1,5 @@
 import User from "../models/UserModel.js";
+import jwt from "jsonwebtoken";
 
 export const verifyUser = async (req, res, next) => {
   if (!req.session.userId) {
@@ -14,6 +15,20 @@ export const verifyUser = async (req, res, next) => {
   req.userId = user.id;
   req.role = user.role;
   next();
+};
+
+export const verifyToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      console.log(err);
+      return res.sendStatus(403);
+    }
+    req.email = decoded.email;
+    next();
+  });
 };
 
 export const adminOnly = async (req, res, next) => {
