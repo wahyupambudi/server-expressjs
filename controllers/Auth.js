@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 
 // function login
 export const login = async (req, res) => {
+  // mencari data user berdasarkan email
   const user = await Users.findOne({
     where: {
       email: req.body.email,
@@ -29,14 +30,16 @@ export const login = async (req, res) => {
   // jsonwebtoken
   const accessToken = jwt.sign(
     { uuid, name, email, role },
+    // proses env dari file .env
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "20s",
+      expiresIn: "20m",
     }
   );
   // membuat variabel refreshToken dari data .env
   const refreshToken = jwt.sign(
     { uuid, name, email, role },
+    // proses env dari file .env
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: "1d",
@@ -82,7 +85,35 @@ export const sessi = async (req, res) => {
 };
 
 // function logout
-export const logout = (req, res) => {
+export const logout = async (req, res) => {
+  // inisialisasi refreshToken dari cookies
+  const refreshToken = req.cookies.refreshToken;
+  // jika refreshToken false
+  if (!refreshToken) return res.sendStatus(204);
+
+  // jika benar, mencari user berdasarkan refresh token yang sama
+  const user = await Users.findAll({
+    where: {
+      refresh_token: refreshToken,
+    },
+  });
+
+  // jika user tidak ditemukan
+  if (!user[0]) return res.sendStatus(204);
+
+  // jika user ditemukan
+  const userId = user[0].id;
+  // update refresh_token menjadi null
+  await Users.update(
+    { refresh_token: null },
+    {
+      where: {
+        id: userId,
+      },
+    }
+  );
+  res.clearCookie("refreshToken");
+  // prosess destroy session di tb sessions
   req.session.destroy((err) => {
     // jika gagal logout
     if (err) return res.status(400).json({ msg: "Tidak dapat Logout" });

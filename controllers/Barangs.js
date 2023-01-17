@@ -4,6 +4,7 @@ import { Op } from "sequelize";
 import path from "path";
 import fs from "fs";
 
+// membuat fungsi untuk getBarang
 export const getBarangs = async (req, res) => {
   try {
     let response;
@@ -22,6 +23,7 @@ export const getBarangs = async (req, res) => {
           "image",
           "url",
         ],
+        // memasukkan nama, email dari model User
         include: [
           {
             model: User,
@@ -36,6 +38,7 @@ export const getBarangs = async (req, res) => {
   }
 };
 
+// membuat fungsi untuk getBarang berdasarkan id/uuid barang
 export const getBarangById = async (req, res) => {
   try {
     const barang = await Barang.findOne({
@@ -66,6 +69,7 @@ export const getBarangById = async (req, res) => {
         where: {
           id: barang.id,
         },
+        // memasukkan nama, email dari model User
         include: [
           {
             model: User,
@@ -80,6 +84,7 @@ export const getBarangById = async (req, res) => {
   }
 };
 
+// membuat fungsi untuk tambah Barang
 export const createBarang = async (req, res) => {
   // mendapatkan data input dari form
   const {
@@ -144,6 +149,7 @@ export const createBarang = async (req, res) => {
   });
 };
 
+// membuat fungsi update barang
 export const updateBarang = async (req, res) => {
   // mendapatkan kodebarang sesuai id
   const barang = await Barang.findOne({
@@ -254,6 +260,7 @@ export const updateBarang = async (req, res) => {
   }
 };
 
+// membuat fungsi delete barang
 export const deleteBarang = async (req, res) => {
   try {
     // mendapatkan kodebarang sesuai id

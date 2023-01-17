@@ -4,6 +4,7 @@ import { Op } from "sequelize";
 import path from "path";
 import fs from "fs";
 
+// membuat fungsi untuk get Jasa Barang
 export const getJbarangs = async (req, res) => {
   try {
     let response;
@@ -22,6 +23,7 @@ export const getJbarangs = async (req, res) => {
           "image",
           "url",
         ],
+        // memasukkan nama, email dari model User
         include: [
           {
             model: User,
@@ -36,6 +38,7 @@ export const getJbarangs = async (req, res) => {
   }
 };
 
+// membuat fungsi untuk get Jasa Barang berdasarkan id
 export const getJbarangById = async (req, res) => {
   try {
     const jbarang = await Jbarang.findOne({
@@ -80,6 +83,7 @@ export const getJbarangById = async (req, res) => {
   }
 };
 
+// membuat fungsi tambah jasa barang
 export const createJbarang = async (req, res) => {
   // mendapatkan data input dari form
   const {
@@ -144,6 +148,7 @@ export const createJbarang = async (req, res) => {
   });
 };
 
+// membuat fungsi update jasa barang
 export const updateJbarang = async (req, res) => {
   // mendapatkan kodebarang sesuai id
   const jbarang = await Jbarang.findOne({

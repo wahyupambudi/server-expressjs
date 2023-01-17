@@ -4,6 +4,7 @@ import db from "../config/database.js";
 // describe datatype
 const { DataTypes } = Sequelize;
 
+// membuat table users
 const Users = db.define(
   "users",
   {

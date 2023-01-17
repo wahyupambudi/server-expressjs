@@ -35,14 +35,15 @@ export const refreshToken = async (req, res) => {
           { uuid, name, email, role },
           process.env.ACCESS_TOKEN_SECRET,
           {
-            expiresIn: "20s",
+            expiresIn: "20m",
           }
         );
+        // tampilkan accessToken
         res.json({ accessToken });
       }
     );
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(403).json({ error: error, msg: "Access Token tidak ada" });
   }
 };

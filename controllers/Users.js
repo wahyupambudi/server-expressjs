@@ -1,6 +1,7 @@
 import User from "../models/UserModel.js";
 import argon2, { hash } from "argon2";
 
+// membuat fungsi get user
 export const getUsers = async (req, res) => {
   try {
     const response = await User.findAll({
@@ -16,6 +17,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
+// membuat fungsi get user berdasarkan id
 export const getUserById = async (req, res) => {
   try {
     const response = await User.findOne({
@@ -34,6 +36,7 @@ export const getUserById = async (req, res) => {
   }
 };
 
+// membuat fungsi tambah user
 export const createUser = async (req, res) => {
   // proses destruct
   const { name, email, password, password1, role } = req.body;
@@ -69,6 +72,7 @@ export const createUser = async (req, res) => {
   }
 };
 
+// membuat fungsi update user
 export const updateUser = async (req, res) => {
   const user = await User.findOne({
     where: {
@@ -134,6 +138,7 @@ export const updateUser = async (req, res) => {
   }
 };
 
+// membuat fungsi delete user
 export const deleteUser = async (req, res) => {
   const user = await User.findOne({
     where: {

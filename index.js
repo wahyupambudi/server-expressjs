@@ -29,7 +29,7 @@ const sessionStore = SequelizeStore(session.Store);
 const store = new sessionStore({
   db: db,
   checkExpirationInterval: 43200000, // interval hapus dari database setiap 12 jam
-  expiration: 900000, // waktu session 15 menit
+  expiration: 1200000, // waktu session 15 menit
 });
 
 // membuat table session di database
@@ -45,7 +45,7 @@ app.use(
     cookie: {
       // auto jika menggunakan http/s
       secure: "auto",
-      maxAge: 900000,
+      maxAge: 1200000,
     },
   })
 );

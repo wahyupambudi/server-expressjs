@@ -5,6 +5,7 @@ import Users from "./UserModel.js";
 // destruct datatype
 const { DataTypes } = Sequelize;
 
+// membuat table Barangs
 const Barangs = db.define(
   "tb_barang",
   {
