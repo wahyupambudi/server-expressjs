@@ -7,11 +7,7 @@ export const getUsers = async (req, res) => {
     const response = await User.findAll({
       attributes: ["uuid", "name", "email", "role"],
     });
-    res.status(200).json({
-      status: true,
-      message: "Data User",
-      data: response,
-    });
+    res.status(200).json({ response });
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
@@ -26,11 +22,7 @@ export const getUserById = async (req, res) => {
         uuid: req.params.id,
       },
     });
-    res.status(200).json({
-      status: true,
-      message: "Data User By UUID",
-      data: response,
-    });
+    res.status(200).json({ response });
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
