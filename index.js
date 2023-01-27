@@ -29,11 +29,16 @@ const sessionStore = SequelizeStore(session.Store);
 const store = new sessionStore({
   db: db,
   checkExpirationInterval: 43200000, // interval hapus dari database setiap 12 jam
-  expiration: 1200000, // waktu session 15 menit
+  expiration: 1200000, // waktu session 20 menit
 });
 
 // membuat table session di database
 // store.sync();
+
+// menampilkan default page express
+app.get("/", (req, res) => {
+  res.send("Welcome to REST API AwonapaKarya!");
+});
 
 // definisikan session
 app.use(
